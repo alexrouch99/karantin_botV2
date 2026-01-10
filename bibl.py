@@ -92,6 +92,5 @@ def click_button(
     x, y = coords
     print(f"[CLICK] Кликаем по координатам: ({x}, {y})")
     pyautogui.click(x, y)
-
     return True
 
