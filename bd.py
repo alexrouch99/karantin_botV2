@@ -2,6 +2,7 @@
 
 import sqlite3
 from pathlib import Path
+from datetime import datetime
 
 DB_PATH = Path(__file__).parent / "quarantine.db"
 
@@ -36,7 +37,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             location TEXT,
             time DATETIME,
-            old_name TEXT,
+            old_name TEXT UNIQUE,
             new_name TEXT,
             image_path TEXT
         )
@@ -64,3 +65,69 @@ def init_db():
         print("🆕 Создана новая база данных:", DB_PATH)
     else:
         print("📂 Используется существующая база данных:", DB_PATH)
+
+def is_blacklisted(item_name: str) -> bool:
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT 1 FROM blacklist WHERE item = ?",
+            (item_name,)
+        )
+        return cursor.fetchone() is not None
+
+
+def add_to_blacklist(item_name: str):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT OR IGNORE INTO blacklist (item) VALUES (?)",
+            (item_name,)
+        )
+        conn.commit()
+
+def add_found_item(location, name, image_path):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+        INSERT INTO found_items (location, name, image_path)
+        VALUES (?, ?, ?)
+        """, (location, name, image_path))
+        conn.commit()
+
+def add_unique_item(location, old_name, new_name, image_path):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+            INSERT INTO items (location, time, old_name, new_name, image_path)
+            VALUES (?, datetime('now'), ?, ?, ?)
+            """, (location, old_name, new_name, image_path))
+            conn.commit()
+            return True  # успешно добавлен
+        except sqlite3.IntegrityError:
+            return False  # такой old_name уже есть
+
+
+def add_item_change(location, old_name, new_name, image_path):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+        INSERT INTO items (location, time, old_name, new_name, image_path)
+        VALUES (?, ?, ?, ?, ?)
+        """, (
+            location,
+            datetime.now(),
+            old_name,
+            new_name,
+            image_path
+        ))
+        conn.commit()
+
+def add_upgrade(old_name, new_name, result):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+        INSERT INTO upgrades (old_name, new_name, result)
+        VALUES (?, ?, ?)
+        """, (old_name, new_name, result))
+        conn.commit()
