@@ -207,60 +207,60 @@ def poisk():
         if not ok:
             continue
 
-
-        timenow = datetime.now()
-        timename = timenow.strftime('%d%m%y%H%M%S')
-
-        image_path = f"capture/history/{timename}.png"
-        pyautogui.screenshot(
-            image_path,
-            region=region_predmet
-        )
-
-        print("Скриншот предмета сделан")
-
-        # --- OCR ---
-        result = scanner.readtext(image_path, detail=0)
-
-        if len(result) < 2:
-            print("OCR не распознал предмет")
-            click_button("capture/ok.png", region=region_predmet)
-            continue
-
-        raw_name = result[1]
-        predmet = raw_name.replace(' ', '_')
-
-        print(f"Найден предмет: {predmet}")
-
-        # --- Проверка черного списка ---
-        # if is_blacklisted(predmet):
-        #     print("Предмет в черном списке")
         #
-        #     putButton('capture/cancel.png', 0.8, 3)
-        #     putButton('capture/ok.PNG', 0.8, 5)
+        # timenow = datetime.now()
+        # timename = timenow.strftime('%d%m%y%H%M%S')
+        #
+        # image_path = f"capture/history/{timename}.png"
+        # pyautogui.screenshot(
+        #     image_path,
+        #     region=region_predmet
+        # )
+        #
+        # print("Скриншот предмета сделан")
+        #
+        # # --- OCR ---
+        # result = scanner.readtext(image_path, detail=0)
+        #
+        # if len(result) < 2:
+        #     print("OCR не распознал предмет")
+        #     click_button("capture/ok.png", region=region_predmet)
         #     continue
-
-        # --- Добавление в БД найденных предметов ---
-        # --- 1. ВСЕ найденные предметы ---
-        add_found_item(
-            location=loc,
-            name=predmet,
-            image_path=image_path
-        )
-        print("Предмет записан в журнал находок")
-
-        # --- 2. ТОЛЬКО уникальные предметы ---
-        added_unique = add_unique_item(
-            location=loc,
-            old_name=raw_name,
-            new_name="*",
-            image_path=image_path
-        )
-
-        if added_unique:
-            print("Новый уникальный предмет добавлен")
-        else:
-            print("Такой предмет уже есть, пропуск")
+        #
+        # raw_name = result[1]
+        # predmet = raw_name.replace(' ', '_')
+        #
+        # print(f"Найден предмет: {predmet}")
+        #
+        # # --- Проверка черного списка ---
+        # # if is_blacklisted(predmet):
+        # #     print("Предмет в черном списке")
+        # #
+        # #     putButton('capture/cancel.png', 0.8, 3)
+        # #     putButton('capture/ok.PNG', 0.8, 5)
+        # #     continue
+        #
+        # # --- Добавление в БД найденных предметов ---
+        # # --- 1. ВСЕ найденные предметы ---
+        # add_found_item(
+        #     location=loc,
+        #     name=predmet,
+        #     image_path=image_path
+        # )
+        # print("Предмет записан в журнал находок")
+        #
+        # # --- 2. ТОЛЬКО уникальные предметы ---
+        # added_unique = add_unique_item(
+        #     location=loc,
+        #     old_name=raw_name,
+        #     new_name="*",
+        #     image_path=image_path
+        # )
+        #
+        # if added_unique:
+        #     print("Новый уникальный предмет добавлен")
+        # else:
+        #     print("Такой предмет уже есть, пропуск")
 
         click_button("capture/ok.png")
 
