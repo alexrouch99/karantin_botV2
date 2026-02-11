@@ -290,21 +290,23 @@ def apgrade():
 
 
                 # 4. Нажимаем кнопку "Начать"
-                click_button("capture/start.png", region=region_modern)
-                while True:
+                if click_button("capture/start.png", region=region_modern) == True:
+                    while True:
 
-                    # Ожидание окончания модернизации апгрейда (поиск только в нужном регионе окна)
-                    s = find_button('capture/success.png', region=region_modern)
-                    f = find_button('capture/fail.png', region=region_modern)
-                    if s:
-                        print(f"Ап успешен!")
-                        click_button('capture/take.png', region=region_modern)
-                        break
-                    if f:
-                        print(f"Ап провал!")
-                        click_button('capture/cancelAp.png', region=region_modern)
-                        break
-                    time.sleep(5)
+                        # Ожидание окончания модернизации апгрейда (поиск только в нужном регионе окна)
+                        s = find_button('capture/success.png', region=region_modern)
+                        f = find_button('capture/fail.png', region=region_modern)
+                        if s:
+                            print(f"Ап успешен!")
+                            click_button('capture/take.png', region=region_modern)
+                            break
+                        if f:
+                            print(f"Ап провал!")
+                            click_button('capture/cancelAp.png', region=region_modern)
+                            break
+                        time.sleep(5)
+                else:
+                    break
             else:
                 break
 
