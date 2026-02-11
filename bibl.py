@@ -288,9 +288,16 @@ def apgrade():
             # 2. Открыть окно апгрейдов и выделить область для выбора апгрейдов
             click_button("capture/apBg.png", region=region_modern)
 
-            if click_button(f'capture/{ap}', region=region_aps) == True:
-
-
+            if click_button(f'capture/{ap}', region=region_aps, conf=0.98) == True:
+                click_button("capture/apSm.png", region=region_modern)
+                if ap == 'apZdr1.png' or ap == 'apMed1.png' or ap == 'apMar1.png' or ap == 'apInf1.png':
+                    click_button("capture/apMan1.png", region=region_aps, conf=0.98)
+                if ap == 'apZdr2.png' or ap == 'apMed2.png' or ap == 'apMar2.png' or ap == 'apInf2.png':
+                    click_button("capture/apMan2.png", region=region_aps, conf=0.98)
+                if ap == 'apZdr3.png' or ap == 'apMed3.png' or ap == 'apMar3.png' or ap == 'apInf3.png':
+                    click_button("capture/apMan3.png", region=region_aps, conf=0.98)
+                if ap == 'apZdr4.png' or ap == 'apMed4.png' or ap == 'apMar4.png' or ap == 'apInf4.png':
+                    click_button("capture/apMan4.png", region=region_aps, conf=0.98)
 
                 # 4. Нажимаем кнопку "Начать"
                 if click_button("capture/start.png", region=region_modern) == True:
