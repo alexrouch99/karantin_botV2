@@ -264,6 +264,51 @@ def poisk():
 
         click_button("capture/ok.png")
 
+def apgrade():
+    pyautogui.sleep(2)
+
+    # 1. Переход в окно Апгрейдов (с паузой в 1 сек)
+    click_button("capture/notepad.png")
+    time.sleep(1)
+    click_button("capture/craft.png")
+    time.sleep(1)
+    click_button("capture/ap.png")
+    time.sleep(1)
+
+
+
+    # 3. Список Апгрейдов
+    aps = ['apInf1.png', 'apInf2.png', 'apInf3.png', 'apInf4.png']
+
+    for ap in aps:
+        while True:
+            # 2. Открыть окно апгрейдов и выделить область для выбора апгрейдов
+            click_button("capture/apBg.png", region=region_modern)
+
+            if click_button(f'capture/{ap}', region=region_aps) == True:
+
+
+
+                # 4. Нажимаем кнопку "Начать"
+                click_button("capture/start.png", region=region_modern)
+                while True:
+
+                    # Ожидание окончания модернизации апгрейда (поиск только в нужном регионе окна)
+                    s = find_button('capture/success.png', region=region_modern)
+                    f = find_button('capture/fail.png', region=region_modern)
+                    if s:
+                        print(f"Ап успешен!")
+                        click_button('capture/take.png', region=region_modern)
+                        break
+                    if f:
+                        print(f"Ап провал!")
+                        click_button('capture/cancelAp.png', region=region_modern)
+                        break
+                    time.sleep(5)
+            else:
+                break
+
+
 def test():
     compare_with_folder()
 
