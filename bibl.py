@@ -34,7 +34,7 @@ def find_button(
     :return: (x, y) если найдено, иначе None
     """
 
-    print(f"[FIND] Загружаем шаблон: {path}")
+    #print(f"[FIND] Загружаем шаблон: {path}")
 
     template = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     if template is None:
@@ -44,7 +44,7 @@ def find_button(
     finish_time = datetime.now() + timedelta(seconds=time_limit)
 
     while datetime.now() < finish_time:
-        print("[FIND] Делаем скриншот")
+        #print("[FIND] Делаем скриншот")
 
         screenshot = pyautogui.screenshot(region=region)
         screen = cv2.cvtColor(
@@ -52,7 +52,7 @@ def find_button(
             cv2.COLOR_RGB2GRAY
         )
 
-        print("[FIND] Сравниваем изображение")
+        #print("[FIND] Сравниваем изображение")
         result = cv2.matchTemplate(
             screen,
             template,
@@ -60,7 +60,7 @@ def find_button(
         )
 
         _, max_val, _, max_loc = cv2.minMaxLoc(result)
-        print(f"[FIND] Уверенность совпадения: {max_val:.3f}")
+        print(f"[FIND] Уверенность совпадения{path}: {max_val:.3f}")
 
         if max_val >= conf:
             x = max_loc[0] + w // 2
@@ -70,13 +70,13 @@ def find_button(
                 x += region[0]
                 y += region[1]
 
-            print(f"[FIND] Кнопка найдена: ({x}, {y})")
+            #print(f"[FIND] Кнопка найдена: ({x}, {y})")
             return x, y
 
-        print("[FIND] Не найдено, ждём...")
+        #print("[FIND] Не найдено, ждём...")
         time.sleep(pause)
 
-    print("[FIND] Таймаут, кнопка не найдена")
+    #print("[FIND] Таймаут, кнопка не найдена")
     return None
 
 def click_button(
@@ -92,7 +92,7 @@ def click_button(
     :return: True если клик выполнен, иначе False
     """
 
-    print(f"[CLICK] Пытаемся нажать кнопку: {path}")
+    #print(f"[CLICK] Пытаемся нажать кнопку: {path}")
 
     coords = find_button(
         path=path,
@@ -103,11 +103,11 @@ def click_button(
     )
 
     if coords is None:
-        print("[CLICK] Кнопка не найдена, клик невозможен")
+        #print("[CLICK] Кнопка не найдена, клик невозможен")
         return False
 
     x, y = coords
-    print(f"[CLICK] Кликаем по координатам: ({x}, {y})")
+    #print(f"[CLICK] Кликаем по координатам: ({x}, {y})")
     pyautogui.click(x, y)
     return True
 
@@ -163,21 +163,21 @@ def eating():
         else:
             print("Персонаж сыт")
             break
+
 def poisk():
     print("Начало поиска")
-    scanner = easyocr.Reader(["ru"], gpu=True)
-    print("EasyOCR включился")
-    #  функция проверки сытости и её восполнения
+    #  1. Функция проверки сытости и её восполнения
     # eating()
-    #  функция открытия окна локации
+
+    #  2. Открыть окно локации
     win = find_button("capture/home.png")
     if win is None:
         click_button("capture/location.png")
         click_button("capture/home.png")
     else:
         click_button("capture/home.png")
-    # ------------------------------
-    # функция проверки локации
+
+    #  3. Проверка названия локации (через их изображения с описанием)
     screenshot = pyautogui.screenshot(region=window_notepad)
     image = cv2.cvtColor(
         np.array(screenshot),
@@ -186,81 +186,38 @@ def poisk():
     loc = compare_with_folder(image, "capture/loc")
 
 
-
+    #  4. Начало цикла поиска
     while True:
         print("Начало цикла")
 
-        # --- Переход в окно поиска ---
+        # 5. Нажимаем на кнопку искать
         button = find_button("capture/poisk.png")
         if button is None:
             click_button("capture/home.png")
         click_button("capture/poisk.png")
 
+        # 6. Если энергия кончилась - заканчиваем поиск
         end = find_button("capture/no_energy.png")
         if end:
             print("Недостаточно энергии")
             return 'END'
 
+        #  7. Убеждаемся в наличии кнопки ОК
         ok = find_button("capture/ok.png", time_limit=5)
         print("Кнопка ОК найдена")
 
         if not ok:
             continue
 
-        #
-        # timenow = datetime.now()
-        # timename = timenow.strftime('%d%m%y%H%M%S')
-        #
-        # image_path = f"capture/history/{timename}.png"
-        # pyautogui.screenshot(
-        #     image_path,
-        #     region=region_predmet
-        # )
-        #
-        # print("Скриншот предмета сделан")
-        #
-        # # --- OCR ---
-        # result = scanner.readtext(image_path, detail=0)
-        #
-        # if len(result) < 2:
-        #     print("OCR не распознал предмет")
-        #     click_button("capture/ok.png", region=region_predmet)
-        #     continue
-        #
-        # raw_name = result[1]
-        # predmet = raw_name.replace(' ', '_')
-        #
-        # print(f"Найден предмет: {predmet}")
-        #
-        # # --- Проверка черного списка ---
-        # # if is_blacklisted(predmet):
-        # #     print("Предмет в черном списке")
-        # #
-        # #     putButton('capture/cancel.png', 0.8, 3)
-        # #     putButton('capture/ok.PNG', 0.8, 5)
-        # #     continue
-        #
-        # # --- Добавление в БД найденных предметов ---
-        # # --- 1. ВСЕ найденные предметы ---
-        # add_found_item(
-        #     location=loc,
-        #     name=predmet,
-        #     image_path=image_path
-        # )
-        # print("Предмет записан в журнал находок")
-        #
-        # # --- 2. ТОЛЬКО уникальные предметы ---
-        # added_unique = add_unique_item(
-        #     location=loc,
-        #     old_name=raw_name,
-        #     new_name="*",
-        #     image_path=image_path
-        # )
-        #
-        # if added_unique:
-        #     print("Новый уникальный предмет добавлен")
-        # else:
-        #     print("Такой предмет уже есть, пропуск")
+        #  8. Создаем скриншот предмета
+        timenow = datetime.now()
+        timename = timenow.strftime('%d%m%y%H%M%S')
+        image_path = f"capture/items/raw/{timename}.png"
+        pyautogui.screenshot(
+            image_path,
+            region=region_predmet
+        )
+        print("Скриншот предмета сделан")
 
         click_button("capture/ok.png")
 
@@ -289,6 +246,7 @@ def apgrade():
             click_button("capture/apBg.png", region=region_modern)
 
             if click_button(f'capture/{ap}', region=region_aps, conf=0.98) == True:
+                #  Выбираем мануал под уровень апгрейда
                 click_button("capture/apSm.png", region=region_modern)
                 if ap == 'apZdr1.png' or ap == 'apMed1.png' or ap == 'apMar1.png' or ap == 'apInf1.png':
                     click_button("capture/apMan1.png", region=region_aps, conf=0.98)
