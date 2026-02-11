@@ -278,7 +278,10 @@ def apgrade():
 
 
     # 3. Список Апгрейдов
-    aps = ['apInf1.png', 'apInf2.png', 'apInf3.png', 'apInf4.png']
+    aps = ['apZdr1.png', 'apMed1.png', 'apMar1.png', 'apInf1.png',
+           'apZdr2.png', 'apMed2.png', 'apMar2.png', 'apInf2.png',
+           'apZdr3.png', 'apMed3.png', 'apMar3.png', 'apInf3.png',
+           'apZdr4.png', 'apMed4.png', 'apMar4.png', 'apInf4.png']
 
     for ap in aps:
         while True:
@@ -305,7 +308,12 @@ def apgrade():
                             click_button('capture/cancelAp.png', region=region_modern)
                             break
                         time.sleep(5)
+                #  Если апов меньше двух, то перемещаем мышь, чтобы окно не загораживала другие апы
                 else:
+                    pyautogui.moveTo(1,1)
+                    time.sleep(1)
+                    pyautogui.moveTo(2,2)
+                    time.sleep(1)
                     break
             else:
                 break
